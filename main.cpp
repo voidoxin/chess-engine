@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cstdint>
-#include "board/include/board.h"
+#include "include/board.h"
 using namespace std;
 int main()
 {
