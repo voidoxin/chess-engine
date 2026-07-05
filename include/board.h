@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
-using namespace std;
-using BitBoard uint64_t;
+// using namespace std;
+using BitBoard = uint64_t;
 extern BitBoard squareMask[64];
 void initSqMask();
 enum Square {
@@ -44,10 +44,10 @@ class Board {
     public:
         Board();
         void board_init();
-        void add_piece(pieces piece,int square);
+        void add_piece(pieces p,int square);
         void delete_piece(pieces piece,int square);
         void move_piece(pieces piece,int from,int to);
         pieces get_piece(int square);
-
+        void print_board();
 
 };
