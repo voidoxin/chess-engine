@@ -1,0 +1,46 @@
+﻿# CMake
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+CMakeUserPresets.json
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+cmake-build-*/
+
+# Build directories
+build/
+out/
+bin/
+dist/
+
+# Compiled & object files
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.pdb
+*.ilk
+*.exp
+
+# Executables
+*.exe
+guide
+guide.out
+a.out
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
