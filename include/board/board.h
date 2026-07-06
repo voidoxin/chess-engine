@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-// using namespace std;
 using BitBoard = uint64_t;
 extern BitBoard squareMask[64];
 void initSqMask();

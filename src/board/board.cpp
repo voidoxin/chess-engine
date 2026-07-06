@@ -80,7 +80,7 @@ Board::Board(){
 void Board::move_piece(pieces piece,int from,int to)
 {
     if(MailBox[from]!=pieces::empty)
-    {//debug func remove before release
+    {//debug if statement remove before release
         if(MailBox[to]!=pieces::empty)
         {
             delete_piece(MailBox[to],to);
