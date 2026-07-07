@@ -3,6 +3,9 @@
 using BitBoard = uint64_t;
 struct AttackTables {
     static BitBoard kingAttacks[64];
+    static BitBoard knightAttacks[64];
+    static BitBoard pawnAttacks[2][64];//0 is white 1 is black 
+    //i can use it like this pawnAttacks[side_to_move][square]
 };
 class LUT_gen {
     private:
@@ -16,7 +19,8 @@ class LUT_gen {
         BitBoard rank8=0ULL;
         void fileRankGen();
         void kingGen();
-        void knighGen();
+        void knightGen();
+        void pawnGen();
     public:
         LUT_gen();
 };
