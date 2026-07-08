@@ -7,8 +7,10 @@ using BitBoard = uint64_t;
 BitBoard AttackTables::kingAttacks[64];
 BitBoard AttackTables::knightAttacks[64];
 BitBoard AttackTables::pawnAttacks[2][64];
-BitBoard AttackTables::bishopAttacks[64][515];
-int magicUtils::shift_number[64];
+BitBoard AttackTables::bishopAttacks[64][512];
+BitBoard AttackTables::rookAttacks[64][4096];
+int magicUtils::bishop_shift_number[64];
+int magicUtils::rook_shift_number[64];
 const BitBoard magicUtils::bishop_magicN[64]= {
     0x89a1121896040240ULL, 0x2004844802002010ULL, 0x200600810c0200c1ULL, 0x2044000841000200ULL,
     0x2100140008044200ULL, 0x8408009100c00010ULL, 0x20a0080820022100ULL, 0x438a001088440010ULL,
@@ -27,6 +29,24 @@ const BitBoard magicUtils::bishop_magicN[64]= {
     0x8021004080ULL,       0x204040110200ULL,     0x240100402100ULL,     0x20400040120ULL,
     0x5400202002ULL,       0x12200420ULL,         0x1410100400010ULL,    0x20a010402ULL
 };
+const BitBoard magicUtils::rook_magicN[64] = {
+    0x8a80104000800020ULL, 0x14000a0004000200ULL, 0x280480a008000400ULL, 0x1000820100400020ULL,
+    0x8080200010008020ULL, 0x2000080100040000ULL, 0x20000100000000ULL, 0x80080000200000ULL,
+    0x40000801000000ULL, 0x1000402000800ULL, 0x400200010000ULL, 0x100040000000ULL,
+    0x4000400000000ULL, 0x400080000ULL, 0x8000000000ULL, 0x8000000000ULL,
+    0x20000000000ULL, 0x20080000ULL, 0x20000000000ULL, 0x40000000000ULL,
+    0x40000000000ULL, 0x40080000000ULL, 0x40000000000ULL, 0x40000000000ULL,
+    0x40000000000ULL, 0x40000000000ULL, 0x80000000000ULL, 0x80000000000ULL,
+    0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL,
+    0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL,
+    0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL,
+    0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL,
+    0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL,
+    0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL,
+    0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL,
+    0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL,
+    0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL, 0x80000000000ULL
+};
 LUT_gen::LUT_gen()
 {
     fileRankGen();
@@ -34,6 +54,7 @@ LUT_gen::LUT_gen()
     knightGen();
     pawnGen();
     bishopGen();
+    rookGen();
 }
 void LUT_gen::fileRankGen()
 {
@@ -114,41 +135,48 @@ BitBoard LUT_gen::bishopMaskGEN(int square)
         file++;
         value|=squareMask[(rank*8)+file];
     }
+    rank=(square / 8);
+    file=(square % 8);
     while(rank<7&&file>0)//up-left
     {
         rank++;
         file--;
         value|=squareMask[(rank*8)+file];
     }
+    rank=(square / 8);
+    file=(square % 8);
     while(rank>0&&file<7)//down-right
     {
         rank--;
         file++;
         value|=squareMask[(rank*8)+file];
     }
+    rank=(square / 8);
+    file=(square % 8);
     while(rank>0&&file>0)//down-left
     {
         rank--;
         file--;
         value|=squareMask[(rank*8)+file];
     }
-    return value;
+    return (value&~(fileA|fileH|rank1|rank8));
 }
-vector<BitBoard> LUT_gen::occupancyGEN(int square,BitBoard bishopMask)
+vector<BitBoard> LUT_gen::occupancyGEN(BitBoard sliderMask)
 {
-    int squaresNm[14];//squares bishop can go
-    int sqNumber=0;//how many squares bishop can go 
+    int squaresNm[14];//squares slider can go
+    int sqNumber=0;//how many squares slider can go 
     BitBoard occupancy=0ULL;
     vector<BitBoard> occupancies;
-    for(int sq=0;sq<64;sq++)//get from bishopMask the number of squares the bishop can go
+    occupancies.clear();
+    for(int sq=0;sq<64;sq++)//get from sliderMask the number of squares the slider can go
     {
-        if((bishopMask & squareMask[sq])!=0)
+        if((sliderMask & squareMask[sq])!=0)
         {
             squaresNm[sqNumber]=sq;
             sqNumber++;
         }
     }
-        LUT_gen::shiftGen(sqNumber,square);//generate shift number for this square
+        N=sqNumber;
     for(int p=0;p<(1 << sqNumber);p++)//loop to all occupancies possible
     {
         occupancy=0ULL;
@@ -160,92 +188,183 @@ vector<BitBoard> LUT_gen::occupancyGEN(int square,BitBoard bishopMask)
             }
         }
         occupancies.push_back(occupancy);
-
     }
     return occupancies;
 }
-BitBoard LUT_gen::bishopAttacksGen(int square,BitBoard occupancy)
+BitBoard LUT_gen::bishopAttacksGen(int sq,BitBoard occupancy)
 {
-    int rank= (square / 8);
-    int file= (square % 8);
+    int rank= (sq / 8);
+    int file= (sq % 8);
     BitBoard attack_squares=0ULL;
-    int sq=0;
+    int bishopSquare=sq;//the startup square
     while(rank<7&&file<7)//up-right
     {
         rank++;
         file++;
         sq=((rank*8)+file);
+        attack_squares |= squareMask[sq];
         if((squareMask[sq] & occupancy) != 0)//if the square is in occupancy
         {
-            attack_squares |= squareMask[sq];
             break;
-        }else 
-        {
-            attack_squares |= squareMask[sq];
         }
     }
-    rank= (square / 8);
-    file= (square % 8);
+    rank= (bishopSquare / 8);
+    file= (bishopSquare % 8);
     while(rank<7&&file>0)//up-left
     {
         rank++;
         file--;
         sq=((rank*8)+file);
+        attack_squares |= squareMask[sq];
         if((squareMask[sq] & occupancy) != 0)//if the square is in occupancy
         {
-            attack_squares |= squareMask[sq];
             break;
-        }else
-        {
-            attack_squares |= squareMask[sq];
         }
     }
-    rank= (square / 8);
-    file= (square % 8);
+    rank= (bishopSquare / 8);
+    file= (bishopSquare % 8);
     while(rank>0&&file<7)//down-right
     {
         rank--;
         file++;
         sq=((rank*8)+file);
+        attack_squares |= squareMask[sq];
         if((squareMask[sq] & occupancy) != 0)//if the square is in occupancy
         {
-            attack_squares |= squareMask[sq];
             break;
-        }else
-        {
-            attack_squares |= squareMask[sq];
         }
     }
-    rank= (square / 8);
-    file= (square % 8);
+    rank= (bishopSquare / 8);
+    file= (bishopSquare % 8);
     while(rank>0&&file>0)//down-left
     {
         rank--;
         file--;
         sq=((rank*8)+file);
+        attack_squares |= squareMask[sq];
         if((squareMask[sq] & occupancy) != 0)//if the square is in occupancy
         {
-            attack_squares |= squareMask[sq];
             break;
-        }else
-        {
-            attack_squares |= squareMask[sq];
         }
     }
-    return attack_squares;
+    return (attack_squares);
 }
-void LUT_gen::shiftGen(int N,int sq)
+void LUT_gen::bishopShiftGen(int N,int sq)
 {
-    magicUtils::shift_number[sq]=64-N;
+    magicUtils::bishop_shift_number[sq]=64-N;
+}
+void LUT_gen::rookShiftGen(int N,int sq)
+{
+    magicUtils::rook_shift_number[sq]=64-N;
 }
 void LUT_gen::bishopGen()
 {
     for(int sq=0;sq<64;sq++)
     {
-        vector<BitBoard> occupancies=occupancyGEN(sq,bishopMaskGEN(sq));
+        vector<BitBoard> occupancies=occupancyGEN(bishopMaskGEN(sq));
+        bishopShiftGen(N,sq);//generate shift number for every square
         for(int i=0;i<occupancies.size();i++)
         {
-            AttackTables::bishopAttacks[sq][(occupancies[i]*magicUtils::bishop_magicN[sq])>>magicUtils::shift_number[sq]]=bishopAttacksGen(sq,occupancies[i]);
+            AttackTables::bishopAttacks[sq][(occupancies[i]*magicUtils::bishop_magicN[sq])>>magicUtils::bishop_shift_number[sq]]=bishopAttacksGen(sq,occupancies[i]);
+        }
+    }
+}
+BitBoard LUT_gen::rookMaskGen(int square)
+{
+    int rank= (square / 8);
+    int file= (square % 8);
+    BitBoard value=0ULL;
+    while(rank<7)
+    {
+        rank++;
+        value |=squareMask[(rank*8)+file];  
+    }
+    rank=(square / 8);
+    file=(square % 8);
+    while(rank>0)
+    {
+        rank--;
+        value |=squareMask[(rank*8)+file];          
+    }
+    rank=(square / 8);
+    file=(square % 8);
+    while(file<7)
+    {
+        file++;
+        value |=squareMask[(rank*8)+file];  
+    }
+    rank=(square / 8);
+    file=(square % 8);
+    while(file>0)
+    {
+        file--;
+        value |=squareMask[(rank*8)+file];
+    }
+    return (value &~(fileA|fileH|rank1|rank8));
+}
+BitBoard LUT_gen::rookAttackGen(int square,BitBoard occupancy)
+{
+    int rank= (square / 8);
+    int file= (square % 8);
+    BitBoard value=0ULL;
+    int rookSquare=square;
+    while(rank<7)
+    {
+        rank++;
+        square=(rank*8)+file;
+        value |=squareMask[square];
+        if((occupancy & squareMask[square]) !=0)
+        {
+            break;
+        }
+    }
+    rank= (rookSquare / 8);
+    file= (rookSquare % 8);
+    while(rank>0)
+    {
+        rank--;
+        square=(rank*8)+file;
+        value |=squareMask[square];
+        if((occupancy & squareMask[square]) !=0)
+        {
+            break;
+        }
+    }
+    rank= (rookSquare / 8);
+    file= (rookSquare % 8);
+    while(file<7)
+    {
+        file++;
+        square=(rank*8)+file;
+        value |=squareMask[square];
+        if((occupancy & squareMask[square]) !=0)
+        {
+            break;
+        }
+    }
+    rank= (rookSquare / 8);
+    file= (rookSquare % 8);
+    while(file>0)
+    {
+        file--;
+        square=(rank*8)+file;
+        value |=squareMask[square];
+        if((occupancy & squareMask[square]) !=0)
+        {
+            break;
+        }
+    }
+        return value;
+}
+void LUT_gen::rookGen()
+{
+    for(int sq=0;sq<64;sq++)
+    {
+        vector<BitBoard> occupancies=occupancyGEN(rookMaskGen(sq));
+        rookShiftGen(N,sq);//generate shift number for every square
+        for(int i=0;i<occupancies.size();i++)
+        {
+            AttackTables::rookAttacks[sq][(occupancies[i]*magicUtils::rook_magicN[sq])>>magicUtils::rook_shift_number[sq]]=rookAttackGen(sq,occupancies[i]);
         }
     }
 }
