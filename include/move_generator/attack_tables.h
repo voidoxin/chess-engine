@@ -1,7 +1,6 @@
 #pragma once
 #include "../board/board.h"
 #include <vector>
-using namespace std;
 using BitBoard = uint64_t;
 struct magicUtils {
     static int bishop_shift_number[64];//shift numbers to generate index for bishop
@@ -16,6 +15,8 @@ struct AttackTables {
     //i can use it like this pawnAttacks[side_to_move][square]
     static BitBoard bishopAttacks[64][512];
     static BitBoard rookAttacks[64][4096];
+    static BitBoard bishopBlindAttacks[64];
+    static BitBoard rookBlindAttacks[64];
 };
 class LUT_gen {
     private:
@@ -29,14 +30,14 @@ class LUT_gen {
         BitBoard rank7=0ULL;
         BitBoard rank8=0ULL;
         int N;//number of squares slider can move i need it in shiftGens
-        void fileRankGen();
-        BitBoard bishopMaskGEN(int square);//return a bitboard by squares bishop can attack in that one square
-        vector<BitBoard> occupancyGEN(BitBoard bishopMask);//return a vector by all possible occupancy on the situation(square)
-        BitBoard bishopAttacksGen(int sq,BitBoard occupancy);//create attack bitboard with square and occupancy
+        void fileRankGen();//init files and ranks i need 
+        void bishopMaskGen();//init bishopBlindAttacks[]
+        std::vector<BitBoard> occupancyGen(BitBoard bishopMask);//return a vector by all possible occupancy on the situation(square)
+        BitBoard bishopAttacksGen(int sq,BitBoard occupancy);//generate attack bitboard with square and occupancy for bishop
         void bishopShiftGen(int N,int sq);//generate shift numbers for bishop
-        void rookShiftGen(int N,int sq);
-        BitBoard rookMaskGen (int square);
-        BitBoard rookAttackGen(int square,BitBoard occupancy);
+        void rookShiftGen(int N,int sq);//generate shift numbers for rook
+        void rookMaskGen ();//init rookBlindAttacks[]
+        BitBoard rookAttackGen(int square,BitBoard occupancy);//create attack bitboard with square and occupancy for rook
         //pieces gen 
         void kingGen();
         void knightGen();
@@ -45,4 +46,5 @@ class LUT_gen {
         void rookGen();
     public:
         LUT_gen();
+        BitBoard queenGen(int square,BitBoard occupancy);
 };

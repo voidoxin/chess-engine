@@ -9,6 +9,8 @@ BitBoard AttackTables::knightAttacks[64];
 BitBoard AttackTables::pawnAttacks[2][64];
 BitBoard AttackTables::bishopAttacks[64][512];
 BitBoard AttackTables::rookAttacks[64][4096];
+BitBoard AttackTables::bishopBlindAttacks[64];
+BitBoard AttackTables::rookBlindAttacks[64];
 int magicUtils::bishop_shift_number[64];
 int magicUtils::rook_shift_number[64];
 const BitBoard magicUtils::bishop_magicN[64]= {
@@ -124,44 +126,49 @@ void LUT_gen::pawnGen()
         }
     }
 }
-BitBoard LUT_gen::bishopMaskGEN(int square)
+void LUT_gen::bishopMaskGen()
 {
-    int rank= (square / 8);
-    int file= (square % 8);
-    BitBoard value=0ULL;
-    while(rank<7&&file<7)//up-right
+    int file;
+    int rank;
+    for(int square=0;square<64;square++)
     {
-        rank++;
-        file++;
-        value|=squareMask[(rank*8)+file];
+        rank= (square / 8);
+        file= (square % 8);
+        BitBoard value=0ULL;
+        while(rank<7&&file<7)//up-right
+        {
+           rank++;
+           file++;
+           value|=squareMask[(rank*8)+file];
+        }
+        rank=(square / 8);
+        file=(square % 8);
+        while(rank<7&&file>0)//up-left
+        {
+            rank++;
+            file--;
+            value|=squareMask[(rank*8)+file];
+        }
+        rank=(square / 8);
+        file=(square % 8);
+        while(rank>0&&file<7)//down-right
+        {
+            rank--;
+            file++;
+            value|=squareMask[(rank*8)+file];
+        }
+        rank=(square / 8);
+        file=(square % 8);
+        while(rank>0&&file>0)//down-left
+        {
+            rank--;
+            file--;
+            value|=squareMask[(rank*8)+file];
+        }
+        AttackTables::bishopBlindAttacks[square]=(value & ~(fileA|fileH|rank1|rank8));
     }
-    rank=(square / 8);
-    file=(square % 8);
-    while(rank<7&&file>0)//up-left
-    {
-        rank++;
-        file--;
-        value|=squareMask[(rank*8)+file];
-    }
-    rank=(square / 8);
-    file=(square % 8);
-    while(rank>0&&file<7)//down-right
-    {
-        rank--;
-        file++;
-        value|=squareMask[(rank*8)+file];
-    }
-    rank=(square / 8);
-    file=(square % 8);
-    while(rank>0&&file>0)//down-left
-    {
-        rank--;
-        file--;
-        value|=squareMask[(rank*8)+file];
-    }
-    return (value&~(fileA|fileH|rank1|rank8));
 }
-vector<BitBoard> LUT_gen::occupancyGEN(BitBoard sliderMask)
+vector<BitBoard> LUT_gen::occupancyGen(BitBoard sliderMask)
 {
     int squaresNm[14];//squares slider can go
     int sqNumber=0;//how many squares slider can go 
@@ -259,9 +266,10 @@ void LUT_gen::rookShiftGen(int N,int sq)
 }
 void LUT_gen::bishopGen()
 {
+    bishopMaskGen();//init bishopBlindAttacks by masks
     for(int sq=0;sq<64;sq++)
     {
-        vector<BitBoard> occupancies=occupancyGEN(bishopMaskGEN(sq));
+        vector<BitBoard> occupancies=occupancyGen(AttackTables::bishopBlindAttacks[sq]);
         bishopShiftGen(N,sq);//generate shift number for every square
         for(int i=0;i<occupancies.size();i++)
         {
@@ -269,38 +277,43 @@ void LUT_gen::bishopGen()
         }
     }
 }
-BitBoard LUT_gen::rookMaskGen(int square)
+void LUT_gen::rookMaskGen()
 {
-    int rank= (square / 8);
-    int file= (square % 8);
-    BitBoard value=0ULL;
-    while(rank<7)
+    int file;
+    int rank;
+    for(int square=0;square<64;square++)
     {
-        rank++;
-        value |=squareMask[(rank*8)+file];  
-    }
-    rank=(square / 8);
-    file=(square % 8);
-    while(rank>0)
-    {
-        rank--;
-        value |=squareMask[(rank*8)+file];          
-    }
-    rank=(square / 8);
-    file=(square % 8);
-    while(file<7)
-    {
+        rank= (square / 8);
+        file= (square % 8);
+        BitBoard value=0ULL;
+        while(rank<7)
+        {
+            rank++;
+            value |=squareMask[(rank*8)+file];  
+        }
+        rank=(square / 8);
+        file=(square % 8);
+        while(rank>0)
+        {
+            rank--;
+            value |=squareMask[(rank*8)+file];          
+        }
+        rank=(square / 8);
+        file=(square % 8);
+        while(file<7)
+        {
         file++;
         value |=squareMask[(rank*8)+file];  
+        }
+        rank=(square / 8);
+        file=(square % 8);
+        while(file>0)
+        {
+            file--;
+            value |=squareMask[(rank*8)+file];
+        }
+       AttackTables::rookBlindAttacks[square]=(value & ~(fileA|fileH|rank1|rank8));
     }
-    rank=(square / 8);
-    file=(square % 8);
-    while(file>0)
-    {
-        file--;
-        value |=squareMask[(rank*8)+file];
-    }
-    return (value &~(fileA|fileH|rank1|rank8));
 }
 BitBoard LUT_gen::rookAttackGen(int square,BitBoard occupancy)
 {
@@ -358,9 +371,10 @@ BitBoard LUT_gen::rookAttackGen(int square,BitBoard occupancy)
 }
 void LUT_gen::rookGen()
 {
+    rookMaskGen();//init bishopBlindAttacks by masks
     for(int sq=0;sq<64;sq++)
     {
-        vector<BitBoard> occupancies=occupancyGEN(rookMaskGen(sq));
+        vector<BitBoard> occupancies=occupancyGen(AttackTables::rookBlindAttacks[sq]);
         rookShiftGen(N,sq);//generate shift number for every square
         for(int i=0;i<occupancies.size();i++)
         {

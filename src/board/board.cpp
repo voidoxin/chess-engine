@@ -13,14 +13,14 @@ void initSqMask ()
 }
 void Board::delete_piece(pieces piece,int square)
 {
-    board_table[static_cast<int>(piece)] &= squareMask[square];//remove piece from board []
+    board_table[static_cast<int>(piece)] &= ~squareMask[square];//remove piece from board []
     MailBox[square]=pieces::empty;//remove piece from MailBox[]
-    occupied &= squareMask[square];
+    occupied &= ~squareMask[square];
     if(static_cast<int>(piece)& 0b1000){//if color is black
-        BlackPieces &= squareMask[square];
+        BlackPieces &= ~squareMask[square];
         return;
     }
-    WhitePieces &= squareMask[square];
+    WhitePieces &= ~squareMask[square];
 }
 void Board::add_piece(pieces p,int square)
 {
@@ -86,7 +86,7 @@ void Board::move_piece(pieces piece,int from,int to)
             delete_piece(MailBox[to],to);
             counter=-1;
         }//methode
-    if(!((static_cast<int>(piece)^7)&11))//check if the piece moved is pawn
+    if(!((static_cast<int>(piece)^7)&11))//check if the piece moved is pawn "!((static_cast<int>(piece)^7)&11)" return true if the piece is black
     {
         counter=-1;
     }
