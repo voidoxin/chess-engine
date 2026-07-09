@@ -46,11 +46,5 @@ class LUT_gen {
         void rookGen();
     public:
         LUT_gen();
-        inline static BitBoard queenAttacks(int square,BitBoard occupancy)
-        {
-            //i used uint64_t because it's faster and this func used too many times in a sec
-            uint64_t bishop_index=((occupancy&AttackTables::bishopBlindAttacks[square]) * magicUtils::bishop_magicN[square])>>magicUtils::bishop_shift_number[square];
-            uint64_t rook_index=((occupancy&AttackTables::rookBlindAttacks[square]) * magicUtils::rook_magicN[square])>>magicUtils::rook_shift_number[square];
-            return (AttackTables::bishopAttacks[square][bishop_index]|AttackTables::rookAttacks[square][rook_index]);
-        }//return squares queen can attack in the square by occupancy
+        static BitBoard queenAttacks(int square,BitBoard occupancy);//return squares queen can attack in the square by occupancy
 };

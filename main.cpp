@@ -2,6 +2,7 @@
 #include <cstdint>
 #include "include/board/board.h"
 #include "include/move_generator/attack_tables.h"
+#include "include/move_generator/Pseudo_move_generator.h"
 #include <chrono>
 using namespace std;
 int main()
