@@ -256,11 +256,11 @@ BitBoard LUT_gen::bishopAttacksGen(int sq,BitBoard occupancy)
     }
     return (attack_squares);
 }
-void LUT_gen::bishopShiftGen(int N,int sq)
+inline void LUT_gen::bishopShiftGen(int N,int sq)
 {
     magicUtils::bishop_shift_number[sq]=64-N;
 }
-void LUT_gen::rookShiftGen(int N,int sq)
+inline void LUT_gen::rookShiftGen(int N,int sq)
 {
     magicUtils::rook_shift_number[sq]=64-N;
 }

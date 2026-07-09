@@ -31,20 +31,22 @@ enum class pieces{//black pieces always : index & 0b1000 != 0
         Black_knights=12,
         Black_pawns=13        
 };
+namespace Board_variables{
+        inline BitBoard board_table[14];
+        inline BitBoard WhitePieces;     
+        inline BitBoard BlackPieces;
+        inline BitBoard occupied;     
+        inline pieces MailBox[64];
+        inline int side_to_move=0;
+        inline int draw_counter=0;       
+}
 class Board {
-    private :
-        BitBoard board_table[14];
-        BitBoard WhitePieces;     
-        BitBoard BlackPieces;
-        BitBoard occupied;     
-        pieces MailBox[64];
-        int side_to_move=0;
-        int counter=0;
+    private:
+        void add_piece(pieces p,int square);
+        void delete_piece(pieces piece,int square);
     public:
         Board();
         void board_init();
-        void add_piece(pieces p,int square);
-        void delete_piece(pieces piece,int square);
         void move_piece(pieces piece,int from,int to);
         pieces get_piece(int square) const;
         void print_board();

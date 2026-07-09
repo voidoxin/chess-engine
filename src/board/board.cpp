@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdint>
 using namespace std;
+using namespace Board_variables;
 BitBoard squareMask[64];
 void initSqMask ()
 {
@@ -84,16 +85,16 @@ void Board::move_piece(pieces piece,int from,int to)
         if(MailBox[to]!=pieces::empty)
         {
             delete_piece(MailBox[to],to);
-            counter=-1;
+            draw_counter=-1;
         }//methode
     if(!((static_cast<int>(piece)^7)&11))//check if the piece moved is pawn "!((static_cast<int>(piece)^7)&11)" return true if the piece is black
     {
-        counter=-1;
+        draw_counter=-1;
     }
         delete_piece(piece,from);
         add_piece(piece,to);
     side_to_move ^=1;
-    counter++;
+    draw_counter++;
     }else{cout<<"debugg a piece moved from empty square is"<<from<<endl;}
 }
 pieces Board::get_piece(int square) const {return MailBox[square];}
