@@ -10,6 +10,10 @@ int main()
     auto start=chrono::high_resolution_clock::now();
     Board board;
     LUT_gen LUT;
+    PseudoGen Gen;
+    moveList depth1;
+    Gen.CapMoveGen(depth1);
+    Gen.QuMoveGen(depth1);
     board.print_board();
     auto end=chrono::high_resolution_clock::now();
     auto dur=end-start;

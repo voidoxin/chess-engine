@@ -3,6 +3,7 @@
 #include "../../include/board/board.h"
 #include <vector>
 using namespace std;
+using namespace files_ranks;
 using BitBoard = uint64_t; 
 BitBoard AttackTables::kingAttacks[64];
 BitBoard AttackTables::knightAttacks[64];
@@ -72,6 +73,7 @@ void LUT_gen::fileRankGen()
         rank1 |= squareMask[sq];
     }
     rank2=rank1 <<  8;
+    rank3=rank2 <<  8;
     rank7=rank1 << 48;
     rank8=rank1 << 56;
 }

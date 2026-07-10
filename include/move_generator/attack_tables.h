@@ -2,6 +2,17 @@
 #include "../board/board.h"
 #include <vector>
 using BitBoard = uint64_t;
+namespace files_ranks{
+        inline BitBoard fileA=0ULL;    
+        inline BitBoard fileH=0ULL;    
+        inline BitBoard fileB=0ULL;    
+        inline BitBoard fileG=0ULL;    
+        inline BitBoard rank1=0ULL;
+        inline BitBoard rank2=0ULL;
+        inline BitBoard rank3=0ULL;
+        inline BitBoard rank7=0ULL;
+        inline BitBoard rank8=0ULL;
+}
 struct magicUtils {
     static int bishop_shift_number[64];//shift numbers to generate index for bishop
     static int rook_shift_number[64];//shift numbers for rook
@@ -21,14 +32,6 @@ struct AttackTables {
 class LUT_gen {
     private:
         // utils func and variables for gen
-        BitBoard fileA=0ULL;    
-        BitBoard fileH=0ULL;    
-        BitBoard fileB=0ULL;    
-        BitBoard fileG=0ULL;    
-        BitBoard rank1=0ULL;
-        BitBoard rank2=0ULL;
-        BitBoard rank7=0ULL;
-        BitBoard rank8=0ULL;
         int N;//number of squares slider can move i need it in shiftGens
         void fileRankGen();//init files and ranks i need 
         void bishopMaskGen();//init bishopBlindAttacks[]
