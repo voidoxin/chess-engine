@@ -5,11 +5,8 @@ using namespace Board_variables;
 using namespace files_ranks;
 inline void PseudoGen::addMove(int from,int to,int flag,moveList &depth)
 {
-    if(to)
-    {
     depth.moves[depth.count]=from|(to<<6)|(flag<<12);
     depth.count++;
-    }
 }
 inline void PseudoGen::knightCapGen(const BitBoard& knightSquares,const BitBoard& enemy_pieces,moveList &depth)
 {
@@ -120,6 +117,64 @@ inline void PseudoGen::BlackPawnQuGen(moveList &depth)
         doubleStep&= (doubleStep-1);
     }
 }
+inline void PseudoGen::WhitePawnCapGen(moveList &depth)
+{   
+    BitBoard PawnSq=board_table[static_cast<int>(pieces::White_pawns)] & ~rank7;//BitBoard of all white pawns on the board
+    int PawnSquare;//the square of one pawn
+    int AttackSquare;
+    BitBoard SqCanCap;
+    BitBoard PawnsCanCap;
+    while(PawnSq)//normal capture move
+    {
+        PawnSquare=__builtin_ctzll(PawnSq);
+        AttackSquare=AttackTables::pawnAttacks[0][PawnSquare] & BlackPieces;
+        while(AttackSquare)
+        {
+            addMove(PawnSquare,__builtin_ctzll(AttackSquare),4,depth);
+            AttackSquare&=(AttackSquare-1);
+        }
+        PawnSq&= (PawnSq-1);
+    }
+    if(enPassantSq!=-1)
+    {
+        SqCanCap=AttackTables::pawnAttacks[1][enPassantSq];//i used the enemy pawn attacks in enPasant square to know square should pawn be to capture en passant
+        PawnsCanCap=SqCanCap & board_table[static_cast<int>(pieces::White_pawns)];
+        while(PawnsCanCap)
+        {
+            addMove(__builtin_ctzll(PawnsCanCap),enPassantSq,5,depth);
+            PawnsCanCap&=(PawnsCanCap-1);
+        }
+    }
+}
+inline void PseudoGen::BlackPawnCapGen(moveList &depth)
+{   
+    BitBoard PawnSq=board_table[static_cast<int>(pieces::Black_pawns)] & ~rank2;//BitBoard of all black pawns on the board
+    int PawnSquare;//the square of one pawn
+    int AttackSquare;
+    BitBoard SqCanCap;//square where pawn can capture en passant
+    BitBoard PawnsCanCap;//pawns squares who can capture en passant
+    while(PawnSq)//normal capture move
+    {
+        PawnSquare=__builtin_ctzll(PawnSq);
+        AttackSquare=AttackTables::pawnAttacks[1][PawnSquare] & BlackPieces;
+        while(AttackSquare)
+        {
+            addMove(PawnSquare,__builtin_ctzll(AttackSquare),4,depth);
+            AttackSquare&=(AttackSquare-1);
+        }
+        PawnSq&= (PawnSq-1);
+    }
+    if(enPassantSq!=-1)
+    {
+        SqCanCap=AttackTables::pawnAttacks[0][enPassantSq];//i used the enemy pawn attacks in enPasant square to know square should pawn be to capture en passant
+        PawnsCanCap=SqCanCap & board_table[static_cast<int>(pieces::Black_pawns)];
+        while(PawnsCanCap)
+        {
+            addMove(__builtin_ctzll(PawnsCanCap),enPassantSq,5,depth);
+            PawnsCanCap&=(PawnsCanCap-1);
+        }
+    }    
+}
 void PseudoGen::QuMoveGen(moveList &depth)
 {
     if(side_to_move)
@@ -140,7 +195,9 @@ void PseudoGen::CapMoveGen(moveList &depth)
     {
         knightCapGen(board_table[static_cast<int>(pieces::Black_knights)],WhitePieces,depth);
         kingCapGen(board_table[static_cast<int>(pieces::Black_king)],WhitePieces,depth);
+        BlackPawnCapGen(depth);
         return;
     }
         knightCapGen(board_table[static_cast<int>(pieces::White_knights)],BlackPieces,depth);
+        WhitePawnCapGen(depth);
 }

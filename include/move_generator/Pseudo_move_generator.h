@@ -30,6 +30,8 @@ class PseudoGen
         //capture moves generators
         void kingCapGen(const BitBoard& kingSquares,const BitBoard& enemy_pieces,moveList &depth);
         void knightCapGen(const BitBoard& knightSquares,const BitBoard& enemy_pieces,moveList &depth);
+        void WhitePawnCapGen(moveList &depth);
+        void BlackPawnCapGen(moveList &depth);
         //quiet move generator 
         void knightQuGen(const BitBoard& friendly_pieces,const BitBoard& knightSquare,const BitBoard& knightSquares,moveList &depth);
         void kingQuGen(const BitBoard& friendly_pieces,const BitBoard& kingSquares,const BitBoard& enemy_pieces,moveList &depth);

@@ -38,7 +38,8 @@ namespace Board_variables{
         inline BitBoard occupied;     
         inline pieces MailBox[64];
         inline int side_to_move=0;
-        inline int draw_counter=0;       
+        inline int draw_counter=0;    
+        inline int enPassantSq=-1;
 }
 class Board {
     private:
