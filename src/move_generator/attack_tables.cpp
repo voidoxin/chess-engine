@@ -395,10 +395,10 @@ void LUT_gen::rookGen()
         }
     }
 }
-inline static BitBoard queenAttacks(int square,BitBoard occupancy)
+BitBoard LUT_gen::queenAttacks(int square)
 {
-            //i used uint64_t because it's faster and this func used too many times in a sec
-    uint64_t bishop_index=((occupancy&AttackTables::bishopBlindAttacks[square]) * magicUtils::bishop_magicN[square])>>magicUtils::bishop_shift_number[square];
-    uint64_t rook_index=((occupancy&AttackTables::rookBlindAttacks[square]) * magicUtils::rook_magicN[square])>>magicUtils::rook_shift_number[square];
+    //i used uint64_t because it's faster and this func used too many times in a sec
+    uint64_t bishop_index=((Board_variables::occupied&AttackTables::bishopBlindAttacks[square]) * magicUtils::bishop_magicN[square])>>magicUtils::bishop_shift_number[square];
+    uint64_t rook_index=((Board_variables::occupied&AttackTables::rookBlindAttacks[square]) * magicUtils::rook_magicN[square])>>magicUtils::rook_shift_number[square];
     return (AttackTables::bishopAttacks[square][bishop_index]|AttackTables::rookAttacks[square][rook_index]);
 }

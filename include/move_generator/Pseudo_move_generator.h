@@ -26,17 +26,21 @@ class PseudoGen
 {
     private:
         //helper functions
-        void addMove(int from,int to,int flag, moveList &depth);//helper function to add a move to 
+        void addMove(const int from,const int to,const int flag, moveList &depth);//helper function to add a move to 
+        int bishopIndexCalc(const int square,const BitBoard& occupancy);
+        int rookIndexCalc(const int square,const BitBoard& occupancy);
         //capture moves generators
         void kingCapGen(const BitBoard& kingSquares,const BitBoard& enemy_pieces,moveList &depth);
         void knightCapGen(const BitBoard& knightSquares,const BitBoard& enemy_pieces,moveList &depth);
         void WhitePawnCapGen(moveList &depth);
         void BlackPawnCapGen(moveList &depth);
+        void queenCapGen(moveList &depth,BitBoard& enemy_pieces,BitBoard& QueenSquares);
         //quiet move generator 
         void knightQuGen(const BitBoard& friendly_pieces,const BitBoard& knightSquare,const BitBoard& knightSquares,moveList &depth);
         void kingQuGen(const BitBoard& friendly_pieces,const BitBoard& kingSquares,const BitBoard& enemy_pieces,moveList &depth);
         void WhitePawnQuGen(moveList &depth);
         void BlackPawnQuGen(moveList &depth);
+        void queenQuGen(moveList &depth,BitBoard& enemy_pieces,BitBoard& friendly_pieces,BitBoard& QueenSquares);
     public:
         void CapMoveGen(moveList &depth);
         void QuMoveGen(moveList &depth);

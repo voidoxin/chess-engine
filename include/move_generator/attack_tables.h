@@ -51,5 +51,5 @@ class LUT_gen {
         void rookGen();
     public:
         LUT_gen();
-        static BitBoard queenAttacks(int square,BitBoard occupancy);//return squares queen can attack in the square by occupancy
+        static BitBoard queenAttacks(int square);//return squares queen can attack in the square by occupancy
 };

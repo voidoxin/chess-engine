@@ -8,6 +8,14 @@ inline void PseudoGen::addMove(int from,int to,int flag,moveList &depth)
     depth.moves[depth.count]=from|(to<<6)|(flag<<12);
     depth.count++;
 }
+inline int PseudoGen::bishopIndexCalc(const int square,const BitBoard& occupancy)
+{
+    return (((occupancy & AttackTables::bishopBlindAttacks[square])*magicUtils::bishop_magicN[square])>>magicUtils::bishop_shift_number[square]);//index formula by magic numbers
+}
+inline int PseudoGen::rookIndexCalc(const int square,const BitBoard& occupancy)
+{
+    return (((occupancy & AttackTables::rookBlindAttacks[square])*magicUtils::rook_magicN[square])>>magicUtils::rook_shift_number[square]);
+}
 inline void PseudoGen::knightCapGen(const BitBoard& knightSquares,const BitBoard& enemy_pieces,moveList &depth)
 {
     BitBoard tempAttackTable;
@@ -233,6 +241,40 @@ inline void PseudoGen::BlackPawnCapGen(moveList &depth)
         PawnSq&=(PawnSq-1);
     }
 }
+inline void PseudoGen::queenCapGen(moveList &depth,BitBoard& enemy_pieces,BitBoard& QueenSquares)
+{
+    BitBoard queenSquares=QueenSquares;
+    BitBoard attack_squares;
+    int queenSq;
+    while(queenSquares)
+    {
+        queenSq=__builtin_ctzll(queenSquares);
+        attack_squares=LUT_gen::queenAttacks(queenSq)& enemy_pieces;
+        while(attack_squares)
+        {
+            addMove(queenSq,__builtin_ctzll(attack_squares),4,depth);
+            attack_squares&=(attack_squares-1);
+        }
+        queenSquares&=(queenSquares-1);
+    }
+}
+inline void PseudoGen::queenQuGen(moveList &depth,BitBoard& enemy_pieces,BitBoard& friendly_pieces,BitBoard& QueenSquares)
+{
+    BitBoard queenSquares=QueenSquares;
+    BitBoard attack_squares;
+    int queenSq;
+    while(queenSquares)
+    {
+        queenSq=__builtin_ctzll(queenSquares);
+        attack_squares=(LUT_gen::queenAttacks(queenSq)& ~enemy_pieces)& ~friendly_pieces;
+        while(attack_squares)
+        {
+            addMove(queenSq,__builtin_ctzll(attack_squares),0,depth);
+            attack_squares&=(attack_squares-1);
+        }
+        queenSquares&=(queenSquares-1);
+    }
+}
 void PseudoGen::QuMoveGen(moveList &depth)
 {
     if(side_to_move)
@@ -240,11 +282,13 @@ void PseudoGen::QuMoveGen(moveList &depth)
         knightQuGen(BlackPieces,board_table[static_cast<int>(pieces::Black_knights)],WhitePieces,depth);
         kingQuGen(BlackPieces,board_table[static_cast<int>(pieces::Black_king)],WhitePieces,depth);
         BlackPawnQuGen(depth);
+        queenQuGen(depth,WhitePieces,BlackPieces,board_table[static_cast<int>(pieces::Black_queen)]);
         return;
     }
         knightQuGen(WhitePieces,board_table[static_cast<int>(pieces::White_knights)],BlackPieces,depth);
         kingQuGen(WhitePieces,board_table[static_cast<int>(pieces::White_king)],BlackPieces,depth);
         WhitePawnQuGen(depth);
+        queenQuGen(depth,BlackPieces,WhitePieces,board_table[static_cast<int>(pieces::White_queen)]);
 
 }
 void PseudoGen::CapMoveGen(moveList &depth)
@@ -254,8 +298,10 @@ void PseudoGen::CapMoveGen(moveList &depth)
         knightCapGen(board_table[static_cast<int>(pieces::Black_knights)],WhitePieces,depth);
         kingCapGen(board_table[static_cast<int>(pieces::Black_king)],WhitePieces,depth);
         BlackPawnCapGen(depth);
+        queenCapGen(depth,WhitePieces,board_table[static_cast<int>(pieces::Black_queen)]);
         return;
     }
         knightCapGen(board_table[static_cast<int>(pieces::White_knights)],BlackPieces,depth);
         WhitePawnCapGen(depth);
+        queenCapGen(depth,BlackPieces,board_table[static_cast<int>(pieces::White_queen)]);
 }
