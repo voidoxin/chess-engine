@@ -2,7 +2,7 @@
 #include "../board/board.h"
 #include <vector>
 using BitBoard = uint64_t;
-namespace files_ranks{
+namespace masks{
         inline BitBoard fileA=0ULL;    
         inline BitBoard fileH=0ULL;    
         inline BitBoard fileB=0ULL;    
@@ -10,8 +10,10 @@ namespace files_ranks{
         inline BitBoard rank1=0ULL;
         inline BitBoard rank2=0ULL;
         inline BitBoard rank3=0ULL;
+        inline BitBoard rank6=0ULL;
         inline BitBoard rank7=0ULL;
         inline BitBoard rank8=0ULL;
+        inline BitBoard castlingMask[64];
 }
 struct magicUtils {
     static int bishop_shift_number[64];//shift numbers to generate index for bishop
@@ -33,7 +35,7 @@ class LUT_gen {
     private:
         // utils func and variables for gen
         int N;//number of squares slider can move i need it in shiftGens
-        void fileRankGen();//init files and ranks i need 
+        void masksGen();//init files and ranks i need 
         void bishopMaskGen();//init bishopBlindAttacks[]
         std::vector<BitBoard> occupancyGen(BitBoard bishopMask);//return a vector by all possible occupancy on the situation(square)
         BitBoard bishopAttacksGen(int sq,BitBoard occupancy);//generate attack bitboard with square and occupancy for bishop

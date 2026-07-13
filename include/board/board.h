@@ -40,6 +40,7 @@ namespace Board_variables{
         inline int side_to_move=0;
         inline int draw_counter=0;    
         inline int enPassantSq=-1;
+        inline uint8_t castlingRights=15;
 }
 class Board {
     private:

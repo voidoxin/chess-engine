@@ -3,7 +3,7 @@
 #include "../../include/board/board.h"
 #include <vector>
 using namespace std;
-using namespace files_ranks;
+using namespace masks;
 using BitBoard = uint64_t; 
 BitBoard AttackTables::kingAttacks[64];
 BitBoard AttackTables::knightAttacks[64];
@@ -52,14 +52,14 @@ const BitBoard magicUtils::rook_magicN[64] = {
 };
 LUT_gen::LUT_gen()
 {
-    fileRankGen();
+    masksGen();
     kingGen();
     knightGen();
     pawnGen();
     bishopGen();
     rookGen();
 }
-void LUT_gen::fileRankGen()
+void LUT_gen::masksGen()
 {
     for(int square=0;square<=56;square+=8)//fileA
     {
@@ -76,6 +76,17 @@ void LUT_gen::fileRankGen()
     rank3=rank2 <<  8;
     rank7=rank1 << 48;
     rank8=rank1 << 56;
+    rank6=rank7 >>  8;
+    for(int Square=0;Square<64;Square++)
+    {
+        castlingMask[Square]=15;
+    }
+    castlingMask[E1]=12;
+    castlingMask[A1]=13;
+    castlingMask[H1]=14;
+    castlingMask[E8]=3;
+    castlingMask[A8]=7;
+    castlingMask[H8]=1;
 }
 void LUT_gen::kingGen()
 {

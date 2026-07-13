@@ -19,5 +19,9 @@ int main()
     auto dur=end-start;
     cout<<"ms:"<<chrono::duration_cast<chrono::milliseconds>(dur).count()<<endl;
     cout<<"nano:"<<chrono::duration_cast<chrono::nanoseconds>(dur).count()<<endl;   
-return 0;
+    for(int i=0;i<depth1.count;i++)//debugging
+    {
+        cout<<i<<"::"<<depth1.moves[i]<<endl;
+    }
+        return 0;
 }
