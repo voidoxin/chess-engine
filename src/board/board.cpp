@@ -77,7 +77,7 @@ void Board::board_init()
 Board::Board(){
     initSqMask();
     board_init();
-}//constructeur init board for fisrt boot
+}//constructeur init board for first boot
 void Board::move_piece(pieces piece,int from,int to)
 {
     if(MailBox[from]!=pieces::empty)

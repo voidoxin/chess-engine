@@ -27,20 +27,24 @@ class PseudoGen
     private:
         //helper functions
         void addMove(const int from,const int to,const int flag, moveList &depth);//helper function to add a move to 
-        int bishopIndexCalc(const int square,const BitBoard& occupancy);
-        int rookIndexCalc(const int square,const BitBoard& occupancy);
+        int bishopIndexCalc(const int square);
+        int rookIndexCalc(const int square);
         //capture moves generators
         void kingCapGen(const BitBoard& kingSquares,const BitBoard& enemy_pieces,moveList &depth);
         void knightCapGen(const BitBoard& knightSquares,const BitBoard& enemy_pieces,moveList &depth);
         void WhitePawnCapGen(moveList &depth);
         void BlackPawnCapGen(moveList &depth);
-        void queenCapGen(moveList &depth,BitBoard& enemy_pieces,BitBoard& QueenSquares);
+        void queenCapGen(const BitBoard& QueenSquares,const BitBoard& enemy_pieces,moveList &depth);
+        void bishopCapGen(const BitBoard& bishopSquares,const BitBoard& enemy_pieces,moveList &depth);
+        void rookCapGen(const BitBoard& rookSquares,const BitBoard& enemy_pieces,moveList &depth);
         //quiet move generator 
-        void knightQuGen(const BitBoard& friendly_pieces,const BitBoard& knightSquare,const BitBoard& knightSquares,moveList &depth);
-        void kingQuGen(const BitBoard& friendly_pieces,const BitBoard& kingSquares,const BitBoard& enemy_pieces,moveList &depth);
+        void knightQuGen(const BitBoard& knightSquare,moveList &depth);
+        void kingQuGen(const BitBoard& kingSquares,moveList &depth);
         void WhitePawnQuGen(moveList &depth);
         void BlackPawnQuGen(moveList &depth);
-        void queenQuGen(moveList &depth,BitBoard& enemy_pieces,BitBoard& friendly_pieces,BitBoard& QueenSquares);
+        void queenQuGen(const BitBoard& QueenSquares,moveList &depth);
+        void bishopQuGen(const BitBoard& bishopSquares,moveList &depth);
+        void rookQuGen(const BitBoard& rookSquares,moveList &depth);
     public:
         void CapMoveGen(moveList &depth);
         void QuMoveGen(moveList &depth);
