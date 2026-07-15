@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include <cstdint>
 using BitBoard = uint64_t;
 extern BitBoard squareMask[64];
 void initSqMask();

@@ -48,26 +48,26 @@ void Board::board_init()
 
         board_table[i]=0ULL;
     }//delete evrything on board
-    add_piece(pieces::Black_king,D8);
-    add_piece(pieces::Black_queen,E8);
-    add_piece(pieces::Black_rooks,56);
-    add_piece(pieces::Black_rooks,63);
-    add_piece(pieces::Black_knights,57);
-    add_piece(pieces::Black_knights,62);
-    add_piece(pieces::Black_bishops,58);
-    add_piece(pieces::Black_bishops,61);
+    add_piece(pieces::Black_king,E8);
+    add_piece(pieces::Black_queen,D8);
+    add_piece(pieces::Black_rooks,A8);
+    add_piece(pieces::Black_rooks,H8);
+    add_piece(pieces::Black_knights,B8);
+    add_piece(pieces::Black_knights,G8);
+    add_piece(pieces::Black_bishops,C8);
+    add_piece(pieces::Black_bishops,F8);
     for(int pawn=48;pawn<=55;pawn++)
     {
         add_piece(pieces::Black_pawns,pawn);
     }
-    add_piece(pieces::White_king,D1);
-    add_piece(pieces::White_queen,E1);
-    add_piece(pieces::White_rooks,0);
-    add_piece(pieces::White_rooks,7);
-    add_piece(pieces::White_knights,1);
-    add_piece(pieces::White_knights,6);
-    add_piece(pieces::White_bishops,2);
-    add_piece(pieces::White_bishops,5);
+    add_piece(pieces::White_king,E1);
+    add_piece(pieces::White_queen,D1);
+    add_piece(pieces::White_rooks,A1);
+    add_piece(pieces::White_rooks,H1);
+    add_piece(pieces::White_knights,B1);
+    add_piece(pieces::White_knights,G1);
+    add_piece(pieces::White_bishops,C1);
+    add_piece(pieces::White_bishops,F1);
     for(int pawn=8;pawn<=15;pawn++)
     {
         add_piece(pieces::White_pawns,pawn);

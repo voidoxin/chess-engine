@@ -119,7 +119,7 @@ inline void PseudoGen::WhitePawnQuGen(moveList &depth)
     while(doubleStep)
     {
         attackSq=__builtin_ctzll(doubleStep);
-        addMove(attackSq-8,attackSq,1,depth);
+        addMove(attackSq-16,attackSq,1,depth);
         doubleStep&= (doubleStep-1);
     }
     OneStep=((board_table[static_cast<int>(pieces::White_pawns)]& rank7)<<8)& ~occupied;
@@ -141,21 +141,31 @@ inline void PseudoGen::BlackPawnQuGen(moveList &depth)
     while(OneStep)
     {
         attackSq=__builtin_ctzll(OneStep);
-        addMove(attackSq-8,attackSq,0,depth);
+        addMove(attackSq+8,attackSq,0,depth);
         OneStep&= (OneStep-1);
     }
     while(doubleStep)
     {
         attackSq=__builtin_ctzll(doubleStep);
-        addMove(attackSq-8,attackSq,1,depth);
+        addMove(attackSq+16,attackSq,1,depth);
         doubleStep&= (doubleStep-1);
+    }
+    OneStep=((board_table[static_cast<int>(pieces::White_pawns)]& rank7)<<8)& ~occupied;
+    while(OneStep)
+    {
+        attackSq=__builtin_ctzll(OneStep);
+        addMove(attackSq+8,attackSq,11,depth);//promotion to queen
+        addMove(attackSq+8,attackSq,10,depth);//promotion to rook
+        addMove(attackSq+8,attackSq,8,depth);//promotion to knight
+        addMove(attackSq+8,attackSq,9,depth);//promotion to bishop
+        OneStep&=(OneStep-1);
     }
 }
 inline void PseudoGen::WhitePawnCapGen(moveList &depth)
 {   
     BitBoard PawnSq=board_table[static_cast<int>(pieces::White_pawns)] & ~rank7;//BitBoard of all white pawns on the board
     int PawnSquare;//the square of one pawn
-    int attack_squares;
+    BitBoard attack_squares;
     int TheAttackSquare;
     BitBoard SqCanCap;
     BitBoard PawnsCanCap;
@@ -199,9 +209,9 @@ inline void PseudoGen::WhitePawnCapGen(moveList &depth)
 }
 inline void PseudoGen::BlackPawnCapGen(moveList &depth)
 {   
-    BitBoard PawnSq=board_table[static_cast<int>(pieces::White_pawns)] & ~rank2;//BitBoard of all white pawns on the board
+    BitBoard PawnSq=board_table[static_cast<int>(pieces::Black_pawns)] & ~rank2;//BitBoard of all white pawns on the board
     int PawnSquare;//the square of one pawn
-    int attack_squares;
+    BitBoard attack_squares;
     int TheAttackSquare;
     BitBoard SqCanCap;
     BitBoard PawnsCanCap;
@@ -219,7 +229,7 @@ inline void PseudoGen::BlackPawnCapGen(moveList &depth)
     if(enPassantSq!=-1)//capture en pasant
     {
         SqCanCap=AttackTables::pawnAttacks[0][enPassantSq];//i used the enemy pawn attacks in enPasant square to know square should pawn be to capture en passant
-        PawnsCanCap=SqCanCap & board_table[static_cast<int>(pieces::White_pawns)];
+        PawnsCanCap=SqCanCap & board_table[static_cast<int>(pieces::Black_pawns)];
         while(PawnsCanCap)
         {
             addMove(__builtin_ctzll(PawnsCanCap),enPassantSq,5,depth);
@@ -377,6 +387,7 @@ void PseudoGen::CapMoveGen(moveList &depth)
         return;
     }
         knightCapGen(board_table[static_cast<int>(pieces::White_knights)],BlackPieces,depth);
+        knightCapGen(board_table[static_cast<int>(pieces::White_king)],BlackPieces,depth);
         WhitePawnCapGen(depth);
         queenCapGen(board_table[static_cast<int>(pieces::White_queen)],BlackPieces,depth);
         bishopCapGen(board_table[static_cast<int>(pieces::White_bishops)],BlackPieces,depth);
