@@ -148,7 +148,7 @@ void LUT_gen::bishopMaskGen()
         rank= (square / 8);
         file= (square % 8);
         BitBoard value=0ULL;
-        while(rank<7&&file<7)//up-right
+        while(rank<6&&file<6)//up-right
         {
            rank++;
            file++;
@@ -156,7 +156,7 @@ void LUT_gen::bishopMaskGen()
         }
         rank=(square / 8);
         file=(square % 8);
-        while(rank<7&&file>0)//up-left
+        while(rank<6&&file>1)//up-left
         {
             rank++;
             file--;
@@ -164,7 +164,7 @@ void LUT_gen::bishopMaskGen()
         }
         rank=(square / 8);
         file=(square % 8);
-        while(rank>0&&file<7)//down-right
+        while(rank>1&&file<6)//down-right
         {
             rank--;
             file++;
@@ -172,7 +172,7 @@ void LUT_gen::bishopMaskGen()
         }
         rank=(square / 8);
         file=(square % 8);
-        while(rank>0&&file>0)//down-left
+        while(rank>1&&file>1)//down-left
         {
             rank--;
             file--;
@@ -299,28 +299,28 @@ void LUT_gen::rookMaskGen()
         rank= (square / 8);
         file= (square % 8);
         BitBoard value=0ULL;
-        while(rank<7)
+        while(rank<6)
         {
             rank++;
             value |=squareMask[(rank*8)+file];  
         }
         rank=(square / 8);
         file=(square % 8);
-        while(rank>0)
+        while(rank>1)
         {
             rank--;
             value |=squareMask[(rank*8)+file];          
         }
         rank=(square / 8);
         file=(square % 8);
-        while(file<7)
+        while(file<6)
         {
         file++;
         value |=squareMask[(rank*8)+file];  
         }
         rank=(square / 8);
         file=(square % 8);
-        while(file>0)
+        while(file>1)
         {
             file--;
             value |=squareMask[(rank*8)+file];
