@@ -23,5 +23,6 @@ int main()
     {
         cout<<i<<"::"<<depth1.moves[i]<<endl;
     }
+    cout<<Board_variables::occupied;
         return 0;
 }

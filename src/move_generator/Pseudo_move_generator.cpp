@@ -87,7 +87,9 @@ inline void PseudoGen::kingQuGen(const BitBoard& kingSquares,moveList &depth)
             addMove(square,attackSquare,0,depth);//add quiet move to moves list 0 flag is quiet
             tempAttackTable&= (tempAttackTable-1);//remove square after add it to move list
     }
-    //castling
+}
+inline void PseudoGen::WhitekingCastleGen(moveList &depth)
+{
     if(castlingRights & 1 && !(occupied & (squareMask[G1]|squareMask[F1])))
     {
         addMove(E1,G1,2,depth);
@@ -96,6 +98,9 @@ inline void PseudoGen::kingQuGen(const BitBoard& kingSquares,moveList &depth)
     {
         addMove(E1,C1,3,depth);
     }
+}
+inline void PseudoGen::BlackkingCastleGen(moveList &depth)
+{
     if(castlingRights & 4 && !(occupied &occupied & (squareMask[G8]|squareMask[F8])))
     {
         addMove(E8,G8,2,depth);
@@ -361,6 +366,7 @@ void PseudoGen::QuMoveGen(moveList &depth)
     {
         knightQuGen(board_table[static_cast<int>(pieces::Black_knights)],depth);
         kingQuGen(board_table[static_cast<int>(pieces::Black_king)],depth);
+        BlackkingCastleGen(depth);
         BlackPawnQuGen(depth);
         queenQuGen(board_table[static_cast<int>(pieces::Black_queen)],depth);
         bishopQuGen(board_table[static_cast<int>(pieces::Black_bishops)],depth);
@@ -369,6 +375,7 @@ void PseudoGen::QuMoveGen(moveList &depth)
     }
         knightQuGen(board_table[static_cast<int>(pieces::White_knights)],depth);
         kingQuGen(board_table[static_cast<int>(pieces::White_king)],depth);
+        WhitekingCastleGen(depth);
         WhitePawnQuGen(depth);
         queenQuGen(board_table[static_cast<int>(pieces::White_queen)],depth);
         bishopQuGen(board_table[static_cast<int>(pieces::White_bishops)],depth);
@@ -387,7 +394,7 @@ void PseudoGen::CapMoveGen(moveList &depth)
         return;
     }
         knightCapGen(board_table[static_cast<int>(pieces::White_knights)],BlackPieces,depth);
-        knightCapGen(board_table[static_cast<int>(pieces::White_king)],BlackPieces,depth);
+        kingCapGen(board_table[static_cast<int>(pieces::White_king)],BlackPieces,depth);
         WhitePawnCapGen(depth);
         queenCapGen(board_table[static_cast<int>(pieces::White_queen)],BlackPieces,depth);
         bishopCapGen(board_table[static_cast<int>(pieces::White_bishops)],BlackPieces,depth);

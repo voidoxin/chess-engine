@@ -178,7 +178,7 @@ void LUT_gen::bishopMaskGen()
             file--;
             value|=squareMask[(rank*8)+file];
         }
-        AttackTables::bishopBlindAttacks[square]=(value & ~(fileA|fileH|rank1|rank8));
+        AttackTables::bishopBlindAttacks[square]=value;
     }
 }
 vector<BitBoard> LUT_gen::occupancyGen(BitBoard sliderMask)
@@ -325,7 +325,7 @@ void LUT_gen::rookMaskGen()
             file--;
             value |=squareMask[(rank*8)+file];
         }
-       AttackTables::rookBlindAttacks[square]=(value & ~(fileA|fileH|rank1|rank8));
+       AttackTables::rookBlindAttacks[square]=value;
     }
 }
 BitBoard LUT_gen::rookAttackGen(int square,BitBoard occupancy)

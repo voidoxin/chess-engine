@@ -40,6 +40,8 @@ class PseudoGen
         //quiet move generator 
         void knightQuGen(const BitBoard& knightSquare,moveList &depth);
         void kingQuGen(const BitBoard& kingSquares,moveList &depth);
+        void BlackkingCastleGen(moveList &depth);
+        void WhitekingCastleGen(moveList &depth);
         void WhitePawnQuGen(moveList &depth);
         void BlackPawnQuGen(moveList &depth);
         void queenQuGen(const BitBoard& QueenSquares,moveList &depth);
