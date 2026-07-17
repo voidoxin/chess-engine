@@ -1,22 +1,49 @@
-#include "../../include/move_generator/Pseudo_move_generator.h"
+#include "../../include/move_generator/move_generator.h"
 #include "../../include/move_generator/attack_tables.h"
 using BitBoard=uint64_t;
 using namespace Board_variables;
 using namespace masks;
-inline void PseudoGen::addMove(int from,int to,int flag,moveList &depth)
+inline void MoveGen::addMove(int from,int to,int flag,moveList &depth)
 {
     depth.moves[depth.count]=to|(from<<6)|(flag<<12);
     depth.count++;
 }
-inline int PseudoGen::bishopIndexCalc(const int square)
+inline int MoveGen::bishopIndexCalc(const int square)
 {
     return (((occupied & AttackTables::bishopBlindAttacks[square])*magicUtils::bishop_magicN[square])>>magicUtils::bishop_shift_number[square]);//index formula by magic numbers
 }
-inline int PseudoGen::rookIndexCalc(const int square)
+inline int MoveGen::rookIndexCalc(const int square)
 {
     return (((occupied & AttackTables::rookBlindAttacks[square])*magicUtils::rook_magicN[square])>>magicUtils::rook_shift_number[square]);
 }
-inline void PseudoGen::knightCapGen(const BitBoard& knightSquares,const BitBoard& enemy_pieces,moveList &depth)
+inline BitBoard MoveGen::PieceAttacked(BitBoard& pieceSquares,int& color)
+{
+    BitBoard pieceSq=pieceSquares;
+    int AttackedSq;
+    BitBoard value=0ULL;
+    while(pieceSq)
+    {
+        if(color)
+        {
+            AttackedSq=__builtin_ctzll(pieceSq);
+            value|=AttackTables::knightAttacks[AttackedSq]&board_table[static_cast<int>(pieces::Black_knights)];
+            value|=AttackTables::bishopAttacks[AttackedSq][bishopIndexCalc(AttackedSq)]&board_table[static_cast<int>(pieces::Black_bishops)]&board_table[static_cast<int>(pieces::Black_queen)];
+            value|=AttackTables::rookAttacks[AttackedSq][rookIndexCalc(AttackedSq)]&board_table[static_cast<int>(pieces::Black_rooks)]&board_table[static_cast<int>(pieces::Black_queen)];
+            value|=AttackTables::pawnAttacks[color][AttackedSq]&board_table[static_cast<int>(pieces::Black_pawns)];
+            pieceSq&=(pieceSq-1);
+        }else
+        {
+            AttackedSq=__builtin_ctzll(pieceSq);
+            value|=AttackTables::knightAttacks[AttackedSq]&board_table[static_cast<int>(pieces::White_knights)];
+            value|=AttackTables::bishopAttacks[AttackedSq][bishopIndexCalc(AttackedSq)]&board_table[static_cast<int>(pieces::White_bishops)]&board_table[static_cast<int>(pieces::White_queen)];
+            value|=AttackTables::rookAttacks[AttackedSq][rookIndexCalc(AttackedSq)]&board_table[static_cast<int>(pieces::White_rooks)]&board_table[static_cast<int>(pieces::White_queen)];
+            value|=AttackTables::pawnAttacks[color][AttackedSq]&board_table[static_cast<int>(pieces::White_pawns)];
+            pieceSq&=(pieceSq-1);
+        }
+    }
+    return value;
+}
+inline void MoveGen::knightCapGen(const BitBoard& knightSquares,const BitBoard& enemy_pieces,moveList &depth)
 {
     BitBoard tempAttackTable;
     BitBoard knightSq=knightSquares;
@@ -36,7 +63,7 @@ inline void PseudoGen::knightCapGen(const BitBoard& knightSquares,const BitBoard
         knightSq&= (knightSq-1);
     }
 }
-inline void PseudoGen::knightQuGen(const BitBoard& knightSquare,moveList &depth)
+inline void MoveGen::knightQuGen(const BitBoard& knightSquare,moveList &depth)
 {
     BitBoard tempAttackTable;
     BitBoard knightSq=knightSquare;
@@ -56,7 +83,7 @@ inline void PseudoGen::knightQuGen(const BitBoard& knightSquare,moveList &depth)
         knightSq&= (knightSq-1);
     }
 }
-inline void PseudoGen::kingCapGen(const BitBoard& kingSquares,const BitBoard& enemy_pieces,moveList &depth)    
+inline void MoveGen::kingCapGen(const BitBoard& kingSquares,const BitBoard& enemy_pieces,moveList &depth)    
 {
     BitBoard tempAttackTable;
     BitBoard kingSq=kingSquares;
@@ -72,7 +99,7 @@ inline void PseudoGen::kingCapGen(const BitBoard& kingSquares,const BitBoard& en
             tempAttackTable&= (tempAttackTable-1);//remove square after add it to move list
     }
 }
-inline void PseudoGen::kingQuGen(const BitBoard& kingSquares,moveList &depth)
+inline void MoveGen::kingQuGen(const BitBoard& kingSquares,moveList &depth)
 {
     BitBoard tempAttackTable;
     BitBoard kingSq=kingSquares;
@@ -88,7 +115,7 @@ inline void PseudoGen::kingQuGen(const BitBoard& kingSquares,moveList &depth)
             tempAttackTable&= (tempAttackTable-1);//remove square after add it to move list
     }
 }
-inline void PseudoGen::WhitekingCastleGen(moveList &depth)
+inline void MoveGen::WhitekingCastleGen(moveList &depth)
 {
     if(castlingRights & 1 && !(occupied & (squareMask[G1]|squareMask[F1])))
     {
@@ -99,7 +126,7 @@ inline void PseudoGen::WhitekingCastleGen(moveList &depth)
         addMove(E1,C1,3,depth);
     }
 }
-inline void PseudoGen::BlackkingCastleGen(moveList &depth)
+inline void MoveGen::BlackkingCastleGen(moveList &depth)
 {
     if(castlingRights & 4 && !(occupied &occupied & (squareMask[G8]|squareMask[F8])))
     {
@@ -110,7 +137,7 @@ inline void PseudoGen::BlackkingCastleGen(moveList &depth)
         addMove(E8,C8,3,depth);
     }
 }
-inline void PseudoGen::WhitePawnQuGen(moveList &depth)
+inline void MoveGen::WhitePawnQuGen(moveList &depth)
 {
     BitBoard OneStep=((board_table[static_cast<int>(pieces::White_pawns)]& ~rank7)<<8)& ~occupied;
     BitBoard doubleStep=((OneStep & rank3)<<8)& ~occupied;
@@ -138,7 +165,7 @@ inline void PseudoGen::WhitePawnQuGen(moveList &depth)
         OneStep&=(OneStep-1);
     }
 }
-inline void PseudoGen::BlackPawnQuGen(moveList &depth)
+inline void MoveGen::BlackPawnQuGen(moveList &depth)
 {
     BitBoard OneStep=((board_table[static_cast<int>(pieces::Black_pawns)]& ~rank2)>>8)& ~occupied;
     BitBoard doubleStep=((OneStep & rank6)>>8)& ~occupied;
@@ -166,7 +193,7 @@ inline void PseudoGen::BlackPawnQuGen(moveList &depth)
         OneStep&=(OneStep-1);
     }
 }
-inline void PseudoGen::WhitePawnCapGen(moveList &depth)
+inline void MoveGen::WhitePawnCapGen(moveList &depth)
 {   
     BitBoard PawnSq=board_table[static_cast<int>(pieces::White_pawns)] & ~rank7;//BitBoard of all white pawns on the board
     int PawnSquare;//the square of one pawn
@@ -212,7 +239,7 @@ inline void PseudoGen::WhitePawnCapGen(moveList &depth)
         PawnSq&=(PawnSq-1);
     }
 }
-inline void PseudoGen::BlackPawnCapGen(moveList &depth)
+inline void MoveGen::BlackPawnCapGen(moveList &depth)
 {   
     BitBoard PawnSq=board_table[static_cast<int>(pieces::Black_pawns)] & ~rank2;//BitBoard of all white pawns on the board
     int PawnSquare;//the square of one pawn
@@ -258,7 +285,7 @@ inline void PseudoGen::BlackPawnCapGen(moveList &depth)
         PawnSq&=(PawnSq-1);
     }
 }
-inline void PseudoGen::queenCapGen(const BitBoard& QueenSquares,const BitBoard& enemy_pieces,moveList &depth)
+inline void MoveGen::queenCapGen(const BitBoard& QueenSquares,const BitBoard& enemy_pieces,moveList &depth)
 {
     BitBoard queenSquares=QueenSquares;
     BitBoard attack_squares;
@@ -275,7 +302,7 @@ inline void PseudoGen::queenCapGen(const BitBoard& QueenSquares,const BitBoard& 
         queenSquares&=(queenSquares-1);
     }
 }
-inline void PseudoGen::queenQuGen(const BitBoard& QueenSquares,moveList &depth)
+inline void MoveGen::queenQuGen(const BitBoard& QueenSquares,moveList &depth)
 {
     BitBoard queenSquares=QueenSquares;
     BitBoard attack_squares;
@@ -292,7 +319,7 @@ inline void PseudoGen::queenQuGen(const BitBoard& QueenSquares,moveList &depth)
         queenSquares&=(queenSquares-1);
     }
 }
-inline void PseudoGen::bishopCapGen(const BitBoard& bishopSquares,const BitBoard& enemy_pieces,moveList &depth)
+inline void MoveGen::bishopCapGen(const BitBoard& bishopSquares,const BitBoard& enemy_pieces,moveList &depth)
 {
     BitBoard bishop_squares=bishopSquares;
     BitBoard attack_squares;
@@ -309,7 +336,7 @@ inline void PseudoGen::bishopCapGen(const BitBoard& bishopSquares,const BitBoard
         bishop_squares&=(bishop_squares-1);
     }
 }
-inline void PseudoGen::bishopQuGen(const BitBoard& bishopSquares,moveList &depth)
+inline void MoveGen::bishopQuGen(const BitBoard& bishopSquares,moveList &depth)
 {
     BitBoard bishop_squares=bishopSquares;
     BitBoard attack_squares;
@@ -326,7 +353,7 @@ inline void PseudoGen::bishopQuGen(const BitBoard& bishopSquares,moveList &depth
         bishop_squares&=(bishop_squares-1);
     }
 }
-inline void PseudoGen::rookCapGen(const BitBoard& rookSquares,const BitBoard& enemy_pieces,moveList &depth)
+inline void MoveGen::rookCapGen(const BitBoard& rookSquares,const BitBoard& enemy_pieces,moveList &depth)
 {
     BitBoard rook_squares=rookSquares;
     int rookSq;
@@ -343,7 +370,7 @@ inline void PseudoGen::rookCapGen(const BitBoard& rookSquares,const BitBoard& en
         rook_squares&=(rook_squares-1);
     }
 }
-inline void PseudoGen::rookQuGen(const BitBoard& rookSquares,moveList &depth)
+inline void MoveGen::rookQuGen(const BitBoard& rookSquares,moveList &depth)
 {
     BitBoard rook_squares=rookSquares;
     int rookSq;
@@ -360,7 +387,7 @@ inline void PseudoGen::rookQuGen(const BitBoard& rookSquares,moveList &depth)
         rook_squares&=(rook_squares-1);
     }
 }
-void PseudoGen::QuMoveGen(moveList &depth)
+void MoveGen::QuMoveGen(moveList &depth)
 {
     if(side_to_move)
     {
@@ -381,7 +408,7 @@ void PseudoGen::QuMoveGen(moveList &depth)
         bishopQuGen(board_table[static_cast<int>(pieces::White_bishops)],depth);
         rookQuGen(board_table[static_cast<int>(pieces::White_rooks)],depth);
 }
-void PseudoGen::CapMoveGen(moveList &depth)
+void MoveGen::CapMoveGen(moveList &depth)
 {
     if(side_to_move)
     {
@@ -399,4 +426,21 @@ void PseudoGen::CapMoveGen(moveList &depth)
         queenCapGen(board_table[static_cast<int>(pieces::White_queen)],BlackPieces,depth);
         bishopCapGen(board_table[static_cast<int>(pieces::White_bishops)],BlackPieces,depth);
         rookCapGen(board_table[static_cast<int>(pieces::White_rooks)],BlackPieces,depth);
+}
+void MoveGen::CheckMoveGen(moveList &depth)
+{
+    BitBoard kingSquare;
+    if(side_to_move)
+    {
+        kingSquare=__builtin_ctzll(board_table[static_cast<int>(pieces::Black_king)]);
+        dangerSquares=AttackedSq(kingSquare,side_to_move);
+        
+
+    }else
+    {
+        kingSquare=__builtin_ctzll(board_table[static_cast<int>(pieces::White_king)]);
+        dangerSquares=AttackedSq(kingSquare,side_to_move);
+        
+    }
+
 }

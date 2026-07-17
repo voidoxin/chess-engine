@@ -22,13 +22,14 @@ flags in moves array in decimal
 14:promotion to rook with capture
 15:promotion to queen with capture
 */
-class PseudoGen
+class MoveGen
 {
     private:
         //helper functions
         void addMove(const int from,const int to,const int flag, moveList &depth);//helper function to add a move to 
         int bishopIndexCalc(const int square);
         int rookIndexCalc(const int square);
+        BitBoard PieceAttacked(BitBoard& pieceSquares,int& color);
         //capture moves generators
         void kingCapGen(const BitBoard& kingSquares,const BitBoard& enemy_pieces,moveList &depth);
         void knightCapGen(const BitBoard& knightSquares,const BitBoard& enemy_pieces,moveList &depth);
@@ -50,4 +51,5 @@ class PseudoGen
     public:
         void CapMoveGen(moveList &depth);
         void QuMoveGen(moveList &depth);
+        void CheckMoveGen(moveList &depth);
 };

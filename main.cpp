@@ -2,7 +2,7 @@
 #include <cstdint>
 #include "include/board/board.h"
 #include "include/move_generator/attack_tables.h"
-#include "include/move_generator/Pseudo_move_generator.h"
+#include "include/move_generator/move_generator.h"
 #include <chrono>
 using namespace std;
 int main()
@@ -10,7 +10,7 @@ int main()
     auto start=chrono::high_resolution_clock::now();
     Board board;
     LUT_gen LUT;
-    PseudoGen Gen;
+    MoveGen Gen;
     moveList depth1;
     Gen.CapMoveGen(depth1);
     Gen.QuMoveGen(depth1);
