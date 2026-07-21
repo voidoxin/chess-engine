@@ -387,6 +387,20 @@ inline void MoveGen::rookQuGen(const BitBoard& rookSquares,moveList &depth)
         rook_squares&=(rook_squares-1);
     }
 }
+inline void MoveGen::kingEscapeGen(const int& kingSquare,const BitBoard& dangerSquares,const BitBoard& friendly_pieces,moveList &depth)
+{
+    BitBoard escapeSquares=AttackTables::kingAttacks[kingSquare]& ~friendly_pieces;
+    int escapeSq;
+    while(escapeSquares)
+    {
+        escapeSq=__builtin_ctzll(escapeSquares);
+        if(escapeSq)
+        {
+            addMove(kingSquare,escapeSq,!!(squareMask[escapeSq]& occupied),depth);
+        }
+        escapeSquares&=(escapeSquares-1);
+    }
+}
 void MoveGen::QuMoveGen(moveList &depth)
 {
     if(side_to_move)
@@ -429,18 +443,36 @@ void MoveGen::CapMoveGen(moveList &depth)
 }
 void MoveGen::CheckMoveGen(moveList &depth)
 {
-    BitBoard kingSquare;
+    int kingSquare;
+    BitBoard dangerSquares;
+    int checkN;
+    BitBoard blockSquares;
     if(side_to_move)
     {
         kingSquare=__builtin_ctzll(board_table[static_cast<int>(pieces::Black_king)]);
-        dangerSquares=AttackedSq(kingSquare,side_to_move);
-        
+        dangerSquares=PieceAttacked(squareMask[kingSquare],side_to_move);
+        checkN=__builtin_popcount(dangerSquares);
+        kingEscapeGen(kingSquare,dangerSquares,BlackPieces,depth);
+        if(checkN==1)
+        {
+            blockSquares=LUT_gen::queenAttacks(kingSquare) & LUT_gen::queenAttacks(__builtin_ctzll(dangerSquares));
 
+        }else//double check
+        {
+
+        }
     }else
     {
         kingSquare=__builtin_ctzll(board_table[static_cast<int>(pieces::White_king)]);
-        dangerSquares=AttackedSq(kingSquare,side_to_move);
-        
+        dangerSquares=PieceAttacked(squareMask[kingSquare],side_to_move);
+        checkN=__builtin_popcount(dangerSquares);
+        kingEscapeGen(kingSquare,dangerSquares,WhitePieces,depth);
+        if(checkN==1)
+        {
+            blockSquares=LUT_gen::queenAttacks(kingSquare) & LUT_gen::queenAttacks(__builtin_ctzll(dangerSquares));
+        }else//double check
+        {
+            
+        }
     }
-
 }

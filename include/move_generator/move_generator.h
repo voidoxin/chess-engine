@@ -38,7 +38,7 @@ class MoveGen
         void queenCapGen(const BitBoard& QueenSquares,const BitBoard& enemy_pieces,moveList &depth);
         void bishopCapGen(const BitBoard& bishopSquares,const BitBoard& enemy_pieces,moveList &depth);
         void rookCapGen(const BitBoard& rookSquares,const BitBoard& enemy_pieces,moveList &depth);
-        //quiet move generator 
+        //quiet move generators 
         void knightQuGen(const BitBoard& knightSquare,moveList &depth);
         void kingQuGen(const BitBoard& kingSquares,moveList &depth);
         void BlackkingCastleGen(moveList &depth);
@@ -48,6 +48,8 @@ class MoveGen
         void queenQuGen(const BitBoard& QueenSquares,moveList &depth);
         void bishopQuGen(const BitBoard& bishopSquares,moveList &depth);
         void rookQuGen(const BitBoard& rookSquares,moveList &depth);
+        //checkMove generators
+        void kingEscapeGen(const int& kingSquare,const BitBoard& dangerSquares,const BitBoard& friendly_pieces,moveList &depth);
     public:
         void CapMoveGen(moveList &depth);
         void QuMoveGen(moveList &depth);
