@@ -200,7 +200,7 @@ vector<BitBoard> LUT_gen::occupancyGen(BitBoard sliderMask)
     for(int p=0;p<(1 << sqNumber);p++)//loop to all occupancies possible
     {
         occupancy=0ULL;
-        for(int bit=0;bit<sqNumber;bit++)//loop for evry bit in p
+        for(int bit=0;bit<sqNumber;bit++)//loop for every bit in p
         {
             if((p >> bit)& 1)
             {

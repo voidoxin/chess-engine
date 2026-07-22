@@ -47,7 +47,7 @@ void Board::board_init()
     {
 
         board_table[i]=0ULL;
-    }//delete evrything on board
+    }//delete everything on board
     add_piece(pieces::Black_king,E8);
     add_piece(pieces::Black_queen,D8);
     add_piece(pieces::Black_rooks,A8);
@@ -77,7 +77,7 @@ void Board::board_init()
 Board::Board(){
     initSqMask();
     board_init();
-}//constructeur init board for first boot
+}//constructor init board for first boot
 void Board::move_piece(pieces piece,int from,int to)
 {
     if(MailBox[from]!=pieces::empty)
@@ -86,7 +86,7 @@ void Board::move_piece(pieces piece,int from,int to)
         {
             delete_piece(MailBox[to],to);
             draw_counter=-1;
-        }//methode
+        }//method
     if(!((static_cast<int>(piece)^7)&11))//check if the piece moved is pawn "!((static_cast<int>(piece)^7)&11)" return true if the piece is black
     {
         draw_counter=-1;
@@ -95,7 +95,7 @@ void Board::move_piece(pieces piece,int from,int to)
         add_piece(piece,to);
     side_to_move ^=1;
     draw_counter++;
-    }else{cout<<"debugg a piece moved from empty square is"<<from<<endl;}
+    }else{cout<<"debug a piece moved from empty square is"<<from<<endl;}
 }
 pieces Board::get_piece(int square) const {return MailBox[square];}
 void Board::print_board()

@@ -212,9 +212,9 @@ inline void MoveGen::WhitePawnCapGen(moveList &depth)
         }
         PawnSq&= (PawnSq-1);
     }
-    if(enPassantSq!=-1)//capture en pasant
+    if(enPassantSq!=-1)//capture en passant
     {
-        SqCanCap=AttackTables::pawnAttacks[1][enPassantSq];//i used the enemy pawn attacks in enPasant square to know square should pawn be to capture en passant
+        SqCanCap=AttackTables::pawnAttacks[1][enPassantSq];//i used the enemy pawn attacks in enPassant square to know square should pawn be to capture en passant
         PawnsCanCap=SqCanCap & board_table[static_cast<int>(pieces::White_pawns)];
         while(PawnsCanCap)
         {
@@ -258,9 +258,9 @@ inline void MoveGen::BlackPawnCapGen(moveList &depth)
         }
         PawnSq&= (PawnSq-1);
     }
-    if(enPassantSq!=-1)//capture en pasant
+    if(enPassantSq!=-1)//capture en passant
     {
-        SqCanCap=AttackTables::pawnAttacks[0][enPassantSq];//i used the enemy pawn attacks in enPasant square to know square should pawn be to capture en passant
+        SqCanCap=AttackTables::pawnAttacks[0][enPassantSq];//i used the enemy pawn attacks in enPassant square to know square should pawn be to capture en passant
         PawnsCanCap=SqCanCap & board_table[static_cast<int>(pieces::Black_pawns)];
         while(PawnsCanCap)
         {
@@ -396,9 +396,25 @@ inline void MoveGen::kingEscapeGen(const int& kingSquare,const BitBoard& dangerS
         escapeSq=__builtin_ctzll(escapeSquares);
         if(escapeSq)
         {
-            addMove(kingSquare,escapeSq,!!(squareMask[escapeSq]& occupied),depth);
+            addMove(kingSquare,escapeSq,!!(squareMask[escapeSq]& occupied)*4,depth);
         }
         escapeSquares&=(escapeSquares-1);
+    }
+}
+inline void MoveGen::knightCheckMoveGen(BitBoard knightSquares,const BitBoard& dangerSquare,const BitBoard& blockSquares,moveList &depth)
+{
+    int knightSq;
+    BitBoard SquaresCanMove;
+    while(knightSquares)
+    {
+        knightSq=__builtin_ctzll(knightSquares);
+        SquaresCanMove=dangerSquare & blockSquares & AttackTables::knightAttacks[knightSq];
+        while(SquaresCanMove)
+        {
+            addMove(knightSq,__builtin_ctzll(SquaresCanMove),!!(squareMask[__builtin_ctzll(SquaresCanMove)]&dangerSquare)*4,depth);
+            SquaresCanMove&=(SquaresCanMove-1);
+        }
+        knightSquares&=(knightSquares-1);
     }
 }
 void MoveGen::QuMoveGen(moveList &depth)

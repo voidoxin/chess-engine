@@ -50,6 +50,9 @@ class MoveGen
         void rookQuGen(const BitBoard& rookSquares,moveList &depth);
         //checkMove generators
         void kingEscapeGen(const int& kingSquare,const BitBoard& dangerSquares,const BitBoard& friendly_pieces,moveList &depth);
+        void knightCheckMoveGen(const BitBoard& knightSquares,const BitBoard& dangerSquare,const BitBoard& blockSquares,moveList &depth);//todo
+        void WhitePawnCheckMoveGen(const BitBoard& pawnSquares,const BitBoard& dangerSquare,const BitBoard& blockSquares,moveList &depth);//todo
+        void BlackPawnCheckMoveGen(const BitBoard& pawnSquares,const BitBoard& dangerSquare,const BitBoard& blockSquares,moveList &depth);//todo
     public:
         void CapMoveGen(moveList &depth);
         void QuMoveGen(moveList &depth);
