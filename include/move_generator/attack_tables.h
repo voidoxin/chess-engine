@@ -21,7 +21,7 @@ struct magicUtils {
     static const BitBoard bishop_magicN[64];//ready bishop magic numbers for every square
     static const BitBoard rook_magicN[64];//ready rook magic numbers for every square
 };
-struct AttackTables {
+struct AttackTables {//LUT attack tables storage 
     static BitBoard kingAttacks[64];
     static BitBoard knightAttacks[64];
     static BitBoard pawnAttacks[2][64];//0 is white 1 is black 
@@ -33,7 +33,7 @@ struct AttackTables {
 };
 class LUT_gen {
     private:
-        // utils func and variables for gen
+        // helpers
         int N;//number of squares slider can move i need it in shiftGens
         void masksGen();//init files and ranks i need 
         void bishopMaskGen();//init bishopBlindAttacks[]

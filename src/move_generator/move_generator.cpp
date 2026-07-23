@@ -1,3 +1,6 @@
+/*
+    this file to generate Pseudo legal only moves on normal mode (quiet)or capture mode or check escaping mode 
+*/
 #include "../../include/move_generator/move_generator.h"
 #include "../../include/move_generator/attack_tables.h"
 using BitBoard=uint64_t;
@@ -472,6 +475,7 @@ void MoveGen::CheckMoveGen(moveList &depth)
         if(checkN==1)
         {
             blockSquares=LUT_gen::queenAttacks(kingSquare) & LUT_gen::queenAttacks(__builtin_ctzll(dangerSquares));
+            knightCheckMoveGen(board_table[static_cast<int>(pieces::Black_knights)],dangerSquares,blockSquares,depth);
 
         }else//double check
         {
@@ -486,6 +490,7 @@ void MoveGen::CheckMoveGen(moveList &depth)
         if(checkN==1)
         {
             blockSquares=LUT_gen::queenAttacks(kingSquare) & LUT_gen::queenAttacks(__builtin_ctzll(dangerSquares));
+            knightCheckMoveGen(board_table[static_cast<int>(pieces::White_knights)],dangerSquares,blockSquares,depth);
         }else//double check
         {
             

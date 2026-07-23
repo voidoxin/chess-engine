@@ -1,3 +1,6 @@
+/*
+    this file is board representation on bitboard and all game variables
+*/
 #include "../../include/board/board.h"
 #include <string>
 #include <iostream>

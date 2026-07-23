@@ -1,7 +1,7 @@
 #pragma once 
 #include <cstdint>
 using BitBoard= uint64_t;
-struct moveList{
+struct moveList{//every object is a depth 
     uint16_t moves[257];
     int count=0;
 };
@@ -48,9 +48,9 @@ class MoveGen
         void queenQuGen(const BitBoard& QueenSquares,moveList &depth);
         void bishopQuGen(const BitBoard& bishopSquares,moveList &depth);
         void rookQuGen(const BitBoard& rookSquares,moveList &depth);
-        //checkMove generators
+        //checkMove generators to generate legal move when king in check
         void kingEscapeGen(const int& kingSquare,const BitBoard& dangerSquares,const BitBoard& friendly_pieces,moveList &depth);
-        void knightCheckMoveGen(const BitBoard& knightSquares,const BitBoard& dangerSquare,const BitBoard& blockSquares,moveList &depth);//todo
+        void knightCheckMoveGen(BitBoard knightSquares,const BitBoard& dangerSquare,const BitBoard& blockSquares,moveList &depth);//todo
         void WhitePawnCheckMoveGen(const BitBoard& pawnSquares,const BitBoard& dangerSquare,const BitBoard& blockSquares,moveList &depth);//todo
         void BlackPawnCheckMoveGen(const BitBoard& pawnSquares,const BitBoard& dangerSquare,const BitBoard& blockSquares,moveList &depth);//todo
     public:

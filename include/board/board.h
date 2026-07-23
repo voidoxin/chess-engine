@@ -31,7 +31,7 @@ enum class pieces{//black pieces always : index & 0b1000 != 0
         Black_knights=12,
         Black_pawns=13        
 };
-namespace Board_variables{
+namespace Board_variables{//all game variables
         inline BitBoard board_table[14];
         inline BitBoard WhitePieces;     
         inline BitBoard BlackPieces;

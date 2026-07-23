@@ -1,3 +1,6 @@
+/*
+    this file is LUT generator to generate tables for every piece on every square
+*/
 #include"../../include/move_generator/attack_tables.h"
 #include <iostream>
 #include "../../include/board/board.h"
@@ -14,7 +17,7 @@ BitBoard AttackTables::bishopBlindAttacks[64];
 BitBoard AttackTables::rookBlindAttacks[64];
 int magicUtils::bishop_shift_number[64];
 int magicUtils::rook_shift_number[64];
-const BitBoard magicUtils::bishop_magicN[64]= {
+const BitBoard magicUtils::bishop_magicN[64]= {//bishop magic numbers ready to be used
     0x40108202082020ULL, 0x2500101010002ULL, 0x420a00c1000000ULL, 0x404040080080040ULL,
     0x4242001800400ULL, 0x102282008400000ULL, 0x94008808080000ULL, 0xa120104200400ULL,
     0x201410028100ULL, 0x40808050024ULL, 0x4100082004101ULL, 0xb008040400800000ULL,
@@ -32,7 +35,7 @@ const BitBoard magicUtils::bishop_magicN[64]= {
     0x8000210802012080ULL, 0x82c4022000ULL, 0x80424020800ULL, 0x2000000410208800ULL,
     0x108610900ULL, 0x4000802080210ULL, 0x2000100c10040040ULL, 0x2040060800408080ULL
 };
-const BitBoard magicUtils::rook_magicN[64] = {
+const BitBoard magicUtils::rook_magicN[64] = {//rook magic numbers ready to be used
     0x84800012c0022581ULL, 0x1500204001018090ULL, 0x1900104301982000ULL, 0x4880080164500080ULL,
     0x6100022800305d00ULL, 0x6100083400110066ULL, 0x1200258411082200ULL, 0xa08001000131c580ULL,
     0x310800140042081ULL, 0xc0c3004000830024ULL, 0x116004030a20084ULL, 0x890a002200400910ULL,
@@ -50,7 +53,7 @@ const BitBoard magicUtils::rook_magicN[64] = {
     0x10014a08000c301ULL, 0x11e040018505ULL, 0x1102100842018122ULL, 0x130000420910009ULL,
     0x19200300528200aULL, 0x4302001004084922ULL, 0x8010810810021084ULL, 0xa200040101805026ULL
 };
-LUT_gen::LUT_gen()
+LUT_gen::LUT_gen()//constructor build all LUT tables
 {
     masksGen();
     kingGen();
@@ -59,15 +62,15 @@ LUT_gen::LUT_gen()
     bishopGen();
     rookGen();
 }
-void LUT_gen::masksGen()
+void LUT_gen::masksGen()//generate all masks needed
 {
     for(int square=0;square<=56;square+=8)//fileA
     {
         fileA |= squareMask[square];
     }
-    fileB=fileA<<1;//fileB
-    fileG=fileA<<6;//fileG
-    fileH=fileA<<7;//fileH
+    fileB=fileA<<1;
+    fileG=fileA<<6;
+    fileH=fileA<<7;
     for(int sq=0;sq<=7;sq++)//rank1
     {
         rank1 |= squareMask[sq];
@@ -77,6 +80,7 @@ void LUT_gen::masksGen()
     rank7=rank1 << 48;
     rank8=rank1 << 56;
     rank6=rank7 >>  8;
+    //castling mask generator
     for(int Square=0;Square<64;Square++)
     {
         castlingMask[Square]=15;
